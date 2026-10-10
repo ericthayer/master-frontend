@@ -1,0 +1,5 @@
+# The portal is a no-build static site that lives in portal/.
+[build]
+  base = ""
+  publish = "portal"
+  command = ""
