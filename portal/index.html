@@ -1,0 +1,25 @@
+<title>Frontend Academy</title>
+<meta name="description" content="A learning portal that teaches product designers Git, HTML and CSS, Markdown, CI/CD, DevTools and Vite.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/views.css">
+<link rel="stylesheet" href="styles/lesson.css">
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="shell">
+  <fd-sidebar></fd-sidebar>
+  <fd-topbar></fd-topbar>
+  <main id="main" class="main" tabindex="-1">
+    <noscript><p class="page">This portal needs JavaScript to load its lessons.</p></noscript>
+  </main>
+</div>
+<div class="scrim" hidden></div>
+<fd-command-palette></fd-command-palette>
+
+<script type="module" src="src/components/fd-topbar.js"></script>
+<script type="module" src="src/main.js"></script>
