@@ -1,0 +1,215 @@
+/* App shell: sidebar rail + top bar + scrolling main region */
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  grid-template-rows: var(--topbar-h) minmax(0, 1fr);
+  grid-template-areas: "side top" "side main";
+  height: 100%;
+}
+
+fd-sidebar {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+
+fd-topbar {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-inline: var(--space-5);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  min-width: 0;
+}
+
+.main {
+  grid-area: main;
+  overflow-y: auto;
+  min-width: 0;
+  container: main / inline-size;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+}
+
+.main:focus { outline: none; }
+
+/* Sidebar internals */
+.side__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--topbar-h);
+  padding-inline: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--fg);
+  flex: none;
+}
+.side__mark {
+  display: grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.side__name { font-family: var(--font-display); font-weight: 650; line-height: 1.1; }
+.side__name small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--fg-faint);
+  letter-spacing: 0.04em;
+}
+
+.side__scroll { flex: 1; overflow-y: auto; padding: var(--space-3); }
+.side__group + .side__group { margin-top: var(--space-5); }
+.side__label { padding: 0 var(--space-3) var(--space-2); font-size: 0.7rem; }
+.side__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+
+.side__link {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-s);
+  color: var(--fg-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.side__link:hover { background: var(--surface-2); color: var(--fg); }
+.side__link[aria-current="page"] {
+  background: var(--surface-3);
+  color: var(--fg);
+}
+.side__link svg { width: 18px; height: 18px; color: var(--link-hue, var(--fg-faint)); }
+.side__link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side__count {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+}
+.side__count[data-done="true"] { color: var(--ok); }
+
+.side__foot {
+  flex: none;
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: var(--space-2);
+}
+.meter {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.meter > i {
+  display: block;
+  height: 100%;
+  width: var(--pct, 0%);
+  background: var(--accent);
+  border-radius: inherit;
+  transition: width 0.4s ease;
+}
+.side__foot p { font-size: var(--step--1); color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+
+/* Top bar internals */
+fd-topbar .top__menu { display: none; }
+.top__crumbs { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step--1);
+  color: var(--fg-muted);
+}
+.crumbs li { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.crumbs li + li::before { content: "/"; color: var(--fg-faint); }
+.crumbs a { color: inherit; text-decoration: none; white-space: nowrap; }
+.crumbs a:hover { color: var(--fg); }
+.crumbs [aria-current] { color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top__spacer { flex: 0 0 var(--space-2); }
+.top__search {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 36px;
+  min-width: 220px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+  color: var(--fg-faint);
+  font-size: var(--step--1);
+  cursor: pointer;
+}
+.top__search:hover { border-color: var(--border-strong); color: var(--fg-muted); }
+.top__search svg { width: 15px; height: 15px; }
+.top__search kbd { margin-left: auto; }
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+  cursor: pointer;
+  flex: none;
+}
+.icon-btn:hover { background: var(--surface-2); }
+.icon-btn svg { width: 17px; height: 17px; }
+
+/* Narrow viewport: sidebar becomes a drawer */
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "top" "main";
+  }
+  fd-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 40;
+    width: min(86vw, 300px);
+    padding-top: env(safe-area-inset-top, 0px);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: var(--shadow);
+  }
+  fd-sidebar[data-open] { transform: none; }
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgb(0 0 0 / 0.5);
+  }
+  fd-topbar .top__menu { display: grid; }
+  .crumbs li:not(:last-child) { display: none; }
+  .crumbs li + li::before { content: none; }
+  fd-topbar { padding-inline: var(--space-4); }
+  .top__search { min-width: 0; }
+  .top__search .label, .top__search kbd { display: none; }
+}
+.side__sync { display: flex; align-items: center; gap: var(--space-2); }
+.side__sync::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--fg-faint); flex: none; }
+.side__sync[data-state="synced"]::before { background: var(--ok); }

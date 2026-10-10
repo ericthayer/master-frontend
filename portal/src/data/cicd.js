@@ -1,0 +1,91 @@
+// @ts-check
+/** @type {import("../types").Module} */
+export const cicd = {
+  id: "cicd",
+  title: "CI/CD & deployment",
+  short: "CI/CD",
+  hue: "var(--hue-cicd)",
+  icon: "M4 4h6v6H4z|M14 14h6v6h-6z|M7 10v4a3 3 0 0 0 3 3h4",
+  tagline: "The automation that checks every change and ships it to users.",
+  outcome: "Read a pipeline, use preview deployments for design review, and know what to do when a check fails.",
+  lessons: [
+    {
+      id: "what-is-ci",
+      title: "What CI and CD mean",
+      minutes: 8,
+      summary: "Automatic checks on every push, and automatic delivery after merge.",
+      blocks: [
+        { t: "p", text: "**Continuous Integration (CI)** means every push to GitHub automatically runs a set of checks: install dependencies, lint the code, run tests, and build the app. If any step fails, the PR shows a red X." },
+        { t: "p", text: "**Continuous Delivery or Deployment (CD)** means that once a change merges into `main`, it is automatically packaged and released, either to a staging environment or straight to production." },
+        { t: "diagram", name: "pipeline", caption: "A typical pipeline. Each stage must pass before the next starts. A failure stops the line and reports back on the pull request." },
+        { t: "callout", tone: "design", title: "Designer translation", text: "CI is a preflight checklist that runs itself every time, like an automated design QA pass that checks contrast, spacing tokens and broken links before anything ships." },
+        { t: "terms", items: [
+          ["Pipeline", "The full sequence of automated steps."],
+          ["Job", "One group of steps that runs on one machine."],
+          ["Runner", "The temporary machine that runs a job."],
+          ["Artifact", "A file the pipeline produces, such as the built site."],
+          ["Lint", "An automated style and mistake check for code."],
+        ] },
+        { t: "quiz", q: "A PR shows a red X next to the \"build\" check. What does that tell you?", options: ["The reviewer rejected it", "An automated step failed and the change cannot be built", "GitHub is down"], answer: 1, why: "Checks are automated. A red X means a step in the pipeline failed; click Details to read the log." },
+      ],
+    },
+    {
+      id: "actions-yaml",
+      title: "Reading a GitHub Actions workflow",
+      minutes: 12,
+      summary: "Workflows are YAML files. You can read one without writing one.",
+      blocks: [
+        { t: "p", text: "GitHub's CI system is called **GitHub Actions**. Each workflow is a YAML file in `.github/workflows/`. YAML uses indentation to show nesting, like an outline." },
+        { t: "code", lang: "yaml", code: "name: CI\n\non:\n  pull_request:\n  push:\n    branches: [main]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n      - run: npm ci\n      - run: npm run lint\n      - run: npm test\n      - run: npm run build", caption: ".github/workflows/ci.yml" },
+        { t: "table", head: ["Line", "Plain English"], rows: [
+          ["`on: pull_request`", "Run on every PR, and on every new commit to it."],
+          ["`push: branches: [main]`", "Also run after something merges to main."],
+          ["`runs-on: ubuntu-latest`", "Use a fresh Linux machine provided by GitHub."],
+          ["`uses: actions/checkout@v4`", "Download the repo's code onto that machine."],
+          ["`run: npm ci`", "Install exact dependency versions from the lockfile."],
+          ["`run: npm run build`", "Build the production version of the site."],
+        ] },
+        { t: "callout", tone: "tip", title: "Where to look", text: "On any PR, the Checks tab lists every job. Click one to see each step with a green check or red X, and expand a step to see its log." },
+        { t: "quiz", q: "In the workflow above, which step would fail if a component had a type error that breaks compilation?", options: ["actions/checkout", "npm run build", "setup-node"], answer: 1, why: "Checkout and setup only prepare the machine. The build step compiles the app, so compile errors surface there (and possibly in lint or test first)." },
+      ],
+    },
+    {
+      id: "environments",
+      title: "Environments and preview deploys",
+      minutes: 9,
+      summary: "Where code runs on its way to users, and the link designers should review.",
+      blocks: [
+        { t: "table", head: ["Environment", "Who uses it", "Updated when"], rows: [
+          ["Local", "You, on your laptop", "Every time you save a file"],
+          ["Preview", "Reviewers of one PR", "Every push to that PR"],
+          ["Staging", "The team, for final checks", "Every merge to main"],
+          ["Production", "Real users", "On release, often automatic"],
+        ] },
+        { t: "p", text: "Hosts like Vercel, Netlify and Cloudflare Pages build a **preview deployment** for every pull request and post its URL on the PR. That URL is a live copy of the site with only that PR's changes." },
+        { t: "callout", tone: "design", title: "This is your review surface", text: "Review the preview link, not a screenshot. Check real data, hover and focus states, both themes, and a narrow window. Comment on the PR with what you found." },
+        { t: "p", text: "Each environment can have different settings, such as which API it talks to. Those settings are environment variables, covered in the Vite module." },
+        { t: "quiz", q: "Where should a designer check a PR's visual changes before it merges?", options: ["Production", "The PR's preview deployment", "Staging"], answer: 1, why: "Staging and production only get changes after merge. The preview deployment is built for that PR specifically." },
+      ],
+    },
+    {
+      id: "failures-rollbacks",
+      title: "When a check fails, and rollbacks",
+      minutes: 9,
+      summary: "Reading failures calmly and undoing a bad release.",
+      blocks: [
+        { t: "steps", items: [
+          { title: "Open the failing check", text: "On the PR, click Details next to the red X." },
+          { title: "Find the first error", text: "Scroll to the first red line. Later errors are often side effects of the first." },
+          { title: "Match it to your change", text: "Does the error name a file you edited? Lint and type errors usually point to an exact file and line." },
+          { title: "Fix, commit, push", text: "Pushing to the same branch reruns the checks automatically." },
+          { title: "Ask with context", text: "If it is unrelated to your change, paste the error and the check name to an engineer. That saves a round trip." },
+        ] },
+        { t: "code", lang: "text", code: "src/components/Card.tsx:14:7\n  error  'title' is defined but never used  no-unused-vars\n\n✖ 1 problem (1 error, 0 warnings)", caption: "A lint error: file, line 14, column 7, and the rule that failed." },
+        { t: "h", text: "Rollbacks" },
+        { t: "p", text: "If a bad change reaches production, the fastest fix is usually to **revert** it: GitHub's Revert button on a merged PR creates a new PR that undoes it. Hosts like Vercel and Netlify can also instantly re-publish the previous deployment." },
+        { t: "callout", tone: "warn", title: "Never skip a failing check", text: "Disabling a test to get green hides the problem. Fix the cause, or ask for help." },
+        { t: "quiz", q: "A merged PR broke the checkout page in production. What is usually the fastest safe fix?", options: ["Delete the branch", "Revert the PR", "Force-push main to an older commit"], answer: 1, why: "A revert is a normal reviewed change that undoes the bad one, without rewriting shared history." },
+      ],
+    },
+  ],
+};
