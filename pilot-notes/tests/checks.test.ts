@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { norm, requiredCheckpoints, runChecks, shuffled } from "../src/lib/checks.ts";
-import { courses } from "../src/content/catalog.ts";
+import { courses, getCourse } from "../src/content/catalog.ts";
 
 test("runChecks evaluates regex checks and survives bad patterns", () => {
   const r = runChecks({ "/index.html": "<h1>Ada</h1>" }, [
@@ -51,5 +51,26 @@ test("every course is well-formed", () => {
 test("free course sandbox checks pass on a solved file", () => {
   const sb = courses[0]!.modules.find((m) => m.sandbox)!.sandbox!;
   const solved = sb.files["/index.html"]!.replace("<h1>Your Name</h1>", "<h1>Ada Lovelace</h1>").replace("background: #ffffff", "background: #111827");
+  assert.ok(runChecks({ "/index.html": solved }, sb.checks).every((r) => r.pass));
+});
+
+test("small-business sandbox checks pass on solved code", () => {
+  const sb = getCourse("copilot-for-small-business")!.modules.find((m) => m.sandbox)!.sandbox!;
+  const start = sb.files["/app.js"]!;
+  for (const fix of [
+    "let total = rooms * 30 + baths * 15;\n  if (weekly) total = total * 0.9;",
+    "let total = rooms * 30;\n  total += 15 * baths;\n  if (weekly) {\n    total *= 0.9;\n  }",
+    "let total = (rooms * 30 + baths * 15) * (weekly ? 0.9 : 1);",
+  ]) {
+    const solved = start.replace("let total = rooms * 30;", fix);
+    assert.ok(runChecks({ "/app.js": solved }, sb.checks).every((r) => r.pass), fix);
+  }
+});
+
+test("freelancer sandbox checks pass on solved markup", () => {
+  const sb = getCourse("copilot-for-freelancers")!.modules.find((m) => m.sandbox)!.sandbox!;
+  const solved = sb.files["/index.html"]!
+    .replace('<article class="option">\n      <h3>Growth', '<article class="option featured">\n      <h3>Growth')
+    .replace("  </section>", '    <article class="option">\n      <h3>Pro</h3>\n      <p class="price">$2,400</p>\n    </article>\n  </section>');
   assert.ok(runChecks({ "/index.html": solved }, sb.checks).every((r) => r.pass));
 });

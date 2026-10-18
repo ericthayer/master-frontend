@@ -1,9 +1,11 @@
 import type { Audience, Course, CourseOutline } from "./types.ts";
 import { freeCourse } from "./courses/copilot-in-30.ts";
 import { productCourse } from "./courses/copilot-for-product-teams.ts";
+import { smallBusinessCourse } from "./courses/copilot-for-small-business.ts";
+import { freelancerCourse } from "./courses/copilot-for-freelancers.ts";
 
 /** Every published course. Order = library order. */
-export const courses: Course[] = [freeCourse, productCourse];
+export const courses: Course[] = [freeCourse, smallBusinessCourse, productCourse, freelancerCourse];
 
 export const audiences: Record<Audience, { label: string; pitch: string; trackSlug: string }> = {
   beginner: { label: "Total beginners", pitch: "Never used AI to build anything? Start here, free.", trackSlug: "copilot-in-30" },
