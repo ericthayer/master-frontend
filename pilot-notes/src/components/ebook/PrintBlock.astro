@@ -1,0 +1,73 @@
+---
+import { Inline } from "../Inline.tsx";
+import type { Block, SandboxSpec } from "../../content/types.ts";
+import { shuffled } from "../../lib/checks.ts";
+
+/** Print rendering of a lesson block. Interactive checkpoints become exercises; answers go to the appendix. */
+interface Props { block: Block; sandbox?: SandboxSpec | undefined; exercise: (id: string) => number }
+const { block: b, sandbox, exercise } = Astro.props;
+const tone = { tip: "Tip", warn: "Watch out", pro: "Pro move" } as const;
+---
+{b.t === "p" && <p><Inline text={b.text} /></p>}
+{b.t === "h" && <h3><Inline text={b.text} /></h3>}
+{b.t === "list" && (b.ordered
+  ? <ol>{b.items.map((i) => <li><Inline text={i} /></li>)}</ol>
+  : <ul>{b.items.map((i) => <li><Inline text={i} /></li>)}</ul>)}
+{b.t === "code" && (
+  <figure class="eb-code">
+    <pre><code>{b.code}</code></pre>
+    {b.caption && <figcaption><Inline text={b.caption} /></figcaption>}
+  </figure>
+)}
+{b.t === "callout" && (
+  <aside class={`eb-callout eb-callout--${b.tone}`}>
+    <p class="eb-callout__t">{tone[b.tone]}: {b.title}</p>
+    <p><Inline text={b.text} /></p>
+  </aside>
+)}
+{b.t === "steps" && (
+  <ol class="eb-steps">{b.items.map((s) => <li><strong>{s.title}.</strong> <Inline text={s.text} /></li>)}</ol>
+)}
+{b.t === "handoff" && (
+  <aside class="eb-handoff">
+    <p class="eb-handoff__t">In {b.tool}: {b.title}</p>
+    <ol>{b.items.map((i) => <li><Inline text={i} /></li>)}</ol>
+  </aside>
+)}
+{b.t === "quiz" && (
+  <div class="eb-ex">
+    <p class="eb-ex__t">Exercise {exercise(b.id)} · Quick check</p>
+    <p><Inline text={b.q} /></p>
+    <ol type="A">{b.options.map((o) => <li><Inline text={o} /></li>)}</ol>
+  </div>
+)}
+{b.t === "fill" && (
+  <div class="eb-ex">
+    <p class="eb-ex__t">Exercise {exercise(b.id)} · Fill in the blanks</p>
+    <p><Inline text={b.prompt} /></p>
+    <pre><code>{b.code}</code></pre>
+  </div>
+)}
+{b.t === "order" && (
+  <div class="eb-ex">
+    <p class="eb-ex__t">Exercise {exercise(b.id)} · Put these in order</p>
+    <p><Inline text={b.prompt} /></p>
+    <ul>{shuffled(b.items, b.id).map((i) => <li><Inline text={i} /></li>)}</ul>
+  </div>
+)}
+{b.t === "verify" && (
+  <div class="eb-ex">
+    <p class="eb-ex__t">Ship it</p>
+    <p><Inline text={b.prompt} /></p>
+    <p class="eb-line">My live URL: ______________________________________________</p>
+  </div>
+)}
+{b.t === "sandbox-task" && sandbox && (
+  <div class="eb-ex eb-sandbox">
+    <p class="eb-ex__t">Hands-on · try it in the course sandbox</p>
+    <p><Inline text={sandbox.task} /></p>
+    <pre><code>{sandbox.files[sandbox.active]}</code></pre>
+    <p class="eb-small">You’re done when:</p>
+    <ul class="eb-checks">{sandbox.checks.map((c) => <li>☐ {c.label}</li>)}</ul>
+  </div>
+)}

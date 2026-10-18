@@ -40,7 +40,7 @@ export const faqs: Array<{ q: string; a: string }> = [
   { q: "Do I need to know how to code?", a: "No. Every course is written for non-developers. You’ll read and tweak a little code inside the lesson, with checks that tell you when you got it right." },
   { q: "Do I need to install anything?", a: "Not for the lessons — the code sandbox runs in your browser. To ship your project you’ll use free accounts on GitHub and Netlify plus the Copilot app; each course walks you through it." },
   { q: "Is GitHub Copilot free?", a: "GitHub offers a free Copilot plan with monthly limits, which is enough to finish our courses. Paid Copilot plans are optional." },
-  { q: "What do I get for $5?", a: "Lifetime access to one course, its e-book (PDF + web), and every future update to that course." },
+  { q: "What do I get for $5?", a: "Lifetime access to one course, its PDF e-book, and every future update to that course." },
   { q: "What does the $24 pass include?", a: "Every course and e-book for a year, including new releases. If you cancel, e-books you downloaded are yours to keep. Already bought a course? Upgrade for $19." },
   { q: "Does it work on my phone?", a: "Yes — lessons, quizzes and the sandbox all work on mobile. Shipping to GitHub and Netlify is easiest on a laptop." },
   { q: "What if it’s not for me?", a: "Email us within 30 days for a full refund." },

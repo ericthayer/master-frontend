@@ -1,0 +1,48 @@
+name: Pilot Notes e-books
+
+# Rebuilds PDF e-books whenever course content or the print template changes,
+# then uploads them to the private Supabase `ebooks` bucket.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pilot-notes/src/content/**"
+      - "pilot-notes/src/components/ebook/**"
+      - "pilot-notes/src/pages/ebook/**"
+      - "pilot-notes/src/styles/ebook.css"
+      - "pilot-notes/scripts/build-ebooks.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pilot-notes-ebooks
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pilot-notes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: pilot-notes/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Build and upload e-books
+        run: npm run ebooks
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ebooks
+          path: pilot-notes/ebooks/*.pdf
+          retention-days: 7

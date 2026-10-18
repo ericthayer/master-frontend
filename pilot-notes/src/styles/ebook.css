@@ -1,0 +1,61 @@
+/* Print stylesheet for e-books. Chromium supports @page margin boxes, so no Paged.js needed. */
+@page {
+  size: A5;
+  margin: 18mm 15mm 20mm;
+  @bottom-center { content: counter(page); font: 9pt "Instrument Sans", system-ui, sans-serif; color: #6b7a76; }
+  @top-right { content: string(module); font: 8pt "Instrument Sans", system-ui, sans-serif; color: #6b7a76; }
+}
+@page :first { margin: 0; @bottom-center { content: none; } @top-right { content: none; } }
+
+:root { --ink: #12181a; --muted: #55625f; --line: #dfe5e3; --soft: #f3f6f5; --c: #3ecf8e; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font: 10pt/1.55 "Instrument Sans", system-ui, sans-serif; color: var(--ink); }
+h1, h2, h3 { font-family: "Bricolage Grotesque", system-ui, sans-serif; line-height: 1.15; break-after: avoid; }
+h2 { font-size: 18pt; margin: 0 0 8pt; string-set: module content(); }
+h3 { font-size: 12pt; margin: 14pt 0 4pt; }
+p { margin: 0 0 7pt; orphans: 3; widows: 3; }
+ul, ol { margin: 0 0 8pt; padding-left: 14pt; }
+li { margin-bottom: 2pt; }
+a { color: inherit; }
+code { font: 8.5pt "JetBrains Mono", ui-monospace, monospace; background: var(--soft); padding: 0 2pt; border-radius: 2pt; }
+pre { margin: 0 0 8pt; padding: 7pt 9pt; background: #0d1113; color: #e4ece9; border-radius: 5pt; white-space: pre-wrap; break-inside: avoid; }
+pre code { background: none; padding: 0; color: inherit; font-size: 8pt; }
+
+.eb-cover { height: 210mm; padding: 22mm 16mm; display: flex; flex-direction: column; justify-content: flex-end; gap: 6pt; color: #e4ece9; break-after: page;
+  background: radial-gradient(80% 60% at 80% 20%, color-mix(in srgb, var(--c) 45%, transparent), transparent 70%), radial-gradient(70% 50% at 10% 90%, rgb(167 139 250 / 0.35), transparent 70%), #0d1113; }
+.eb-cover h1 { font-size: 30pt; margin: 0; }
+.eb-cover__brand { font-weight: 800; color: var(--c); margin-bottom: auto; }
+.eb-cover__tag { font-size: 13pt; }
+.eb-cover__meta, .eb-cover__ed { color: #93a39e; font-size: 9pt; }
+.eb-cover__proj { padding: 6pt 9pt; border: 1px solid color-mix(in srgb, var(--c) 60%, transparent); border-radius: 5pt; align-self: flex-start; }
+
+.eb-toc { break-after: page; }
+.eb-toc ol { list-style: none; padding: 0; counter-reset: t; }
+.eb-toc li { counter-increment: t; display: flex; gap: 6pt; padding: 5pt 0; border-bottom: 1px dotted var(--line); }
+.eb-toc li::before { content: counter(t, decimal-leading-zero); color: var(--c); font-weight: 800; }
+.eb-toc li.eb-toc__app::before { content: "A"; }
+.eb-toc a { text-decoration: none; flex: 1; }
+.eb-toc span { color: var(--muted); }
+
+.eb-mod { break-before: page; }
+.eb-mod__k { color: color-mix(in srgb, var(--c) 70%, #000); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 8pt; margin: 0; }
+.eb-obj { border: 1px dashed var(--line); border-radius: 5pt; padding: 6pt 9pt; margin-bottom: 10pt; }
+.eb-obj__t, .eb-take__t, .eb-ex__t, .eb-callout__t, .eb-handoff__t { font-weight: 800; margin-bottom: 3pt; }
+.eb-callout, .eb-handoff, .eb-ex, .eb-take { border-radius: 5pt; padding: 7pt 9pt; margin: 0 0 9pt; break-inside: avoid; }
+.eb-callout { background: var(--soft); border-left: 3pt solid var(--c); }
+.eb-callout--warn { border-left-color: #f5b84a; }
+.eb-callout--pro { border-left-color: #a78bfa; }
+.eb-handoff { border: 1px solid #7dd3fc; background: #f0f9ff; }
+.eb-ex { border: 1px solid var(--line); }
+.eb-ex__t { color: #7c5cff; text-transform: uppercase; font-size: 8pt; letter-spacing: 0.06em; }
+.eb-take { background: color-mix(in srgb, var(--c) 12%, #fff); }
+.eb-steps li { margin-bottom: 4pt; }
+.eb-code { margin: 0 0 8pt; }
+.eb-code figcaption, .eb-small { font-size: 8pt; color: var(--muted); }
+.eb-checks { list-style: none; padding-left: 0; }
+.eb-line { color: var(--muted); }
+.eb-answers li { margin-bottom: 6pt; }
+.eb-end { margin-top: 20pt; font-size: 7.5pt; color: var(--muted); }
+
+@media screen { body { max-width: 148mm; margin: 0 auto; padding: 10mm 0; } .eb-cover { height: auto; min-height: 180mm; } }

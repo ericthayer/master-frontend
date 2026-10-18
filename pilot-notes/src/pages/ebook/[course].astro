@@ -1,0 +1,91 @@
+---
+/**
+ * Print-ready e-book for one course. Built ONLY when EBOOK_BUILD=1 (scripts/build-ebooks.mjs),
+ * so paid lesson text never reaches the public deploy. Chromium prints it to PDF.
+ */
+import PrintBlock from "../../components/ebook/PrintBlock.astro";
+import { Inline } from "../../components/Inline.tsx";
+import { courses, toOutline, audiences } from "../../content/catalog.ts";
+import { product } from "../../config/product.ts";
+import { reference } from "../../content/reference.ts";
+import type { Block, Course } from "../../content/types.ts";
+import "../../styles/ebook.css";
+
+export function getStaticPaths() {
+  if (process.env.EBOOK_BUILD !== "1") return [];
+  return courses.map((course) => ({ params: { course: course.slug }, props: { course } }));
+}
+const { course } = Astro.props as { course: Course };
+const outline = toOutline(course);
+
+type Ex = Extract<Block, { t: "quiz" | "fill" | "order" }>;
+const exercises: Array<{ n: number; module: string; block: Ex }> = [];
+for (const m of course.modules) for (const b of m.blocks) if (b.t === "quiz" || b.t === "fill" || b.t === "order") exercises.push({ n: exercises.length + 1, module: m.title, block: b });
+const exercise = (id: string) => exercises.find((e) => e.block.id === id)?.n ?? 0;
+const edition = new Date().toISOString().slice(0, 10);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;600&display=block" />
+    <title>{outline.title} — {product.name}</title>
+  </head>
+  <body style={`--c: ${outline.accent}`}>
+    <section class="eb-cover">
+      <p class="eb-cover__brand">✈ {product.name}</p>
+      <h1>{outline.title}</h1>
+      <p class="eb-cover__tag">{outline.tagline}</p>
+      <p class="eb-cover__meta">{audiences[outline.audience].label} · {outline.modules.length} modules · {outline.minutes} minutes</p>
+      <p class="eb-cover__proj">You’ll ship: {outline.project}</p>
+      <p class="eb-cover__ed">Edition {edition} · Copilot details checked: {reference.verifiedOn}</p>
+    </section>
+
+    <nav class="eb-toc">
+      <h2>Contents</h2>
+      <ol>
+        {course.modules.map((m) => <li><a href={`#${m.id}`}>{m.title}</a> <span>{m.minutes} min</span></li>)}
+        {exercises.length > 0 && <li class="eb-toc__app"><a href="#answers">Answer key</a></li>}
+      </ol>
+    </nav>
+
+    {course.modules.map((m, i) => (
+      <article class="eb-mod" id={m.id}>
+        <p class="eb-mod__k">Module {i + 1} · {m.minutes} min</p>
+        <h2>{m.title}</h2>
+        <div class="eb-obj">
+          <p class="eb-obj__t">You will be able to</p>
+          <ul>{m.objectives.map((o) => <li>{o}</li>)}</ul>
+        </div>
+        {m.blocks.map((b) => <PrintBlock block={b} sandbox={m.sandbox} exercise={exercise} />)}
+        {m.takeaways.length > 0 && (
+          <aside class="eb-take">
+            <p class="eb-take__t">Key takeaways</p>
+            <ul>{m.takeaways.map((t) => <li><Inline text={t} /></li>)}</ul>
+          </aside>
+        )}
+      </article>
+    ))}
+
+    {exercises.length > 0 && (
+      <section class="eb-mod eb-answers" id="answers">
+        <h2>Answer key</h2>
+        <ol>
+          {exercises.map(({ n, module, block: b }) => (
+            <li value={n}>
+              <span class="eb-small">{module}</span><br />
+              {b.t === "quiz" && <><strong>{String.fromCharCode(65 + b.answer)}. <Inline text={b.options[b.answer]!} /></strong> — <Inline text={b.why} /></>}
+              {b.t === "fill" && <><strong>{b.answers.map((a) => `“${a}”`).join(", ")}</strong> — <Inline text={b.why} /></>}
+              {b.t === "order" && <><strong>{b.items.join(" → ")}</strong> — <Inline text={b.why} /></>}
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    <footer class="eb-end">
+      <p>Licensed to the purchaser for personal use. {product.disclaimer}</p>
+    </footer>
+  </body>
+</html>

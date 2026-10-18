@@ -4,6 +4,7 @@ import { hasAccess } from "../../lib/access.ts";
 import { useProgress } from "../../lib/progress-store.ts";
 import { BADGES, courseProgress, totalXp } from "../../lib/progress.ts";
 import { accountsEnabled } from "../../lib/supabase.ts";
+import EbookButton from "./EbookButton.tsx";
 
 export default function Library({ outlines }: { outlines: CourseOutline[] }) {
   const auth = useAuth();
@@ -30,6 +31,7 @@ export default function Library({ outlines }: { outlines: CourseOutline[] }) {
               <span><strong>{o.title}</strong><br /><span className="muted">{pct}% complete{progress.liveUrls[o.slug] ? " · 🚀 live" : ""}</span></span>
               <span style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                 <a className="btn btn--sm btn--primary" href={`/learn/${o.slug}/${resume.id}`}>{pct === 0 ? "Start" : pct === 100 ? "Review" : "Resume"}</a>
+                {o.tier === "paid" && <EbookButton course={o.slug} />}
               </span>
             </li>
           );
