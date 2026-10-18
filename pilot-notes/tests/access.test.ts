@@ -34,5 +34,5 @@ test("parseNetlifyUrl only accepts https *.netlify.app", () => {
 test("safeNext keeps redirects on-site", () => {
   assert.equal(safeNext("/learn/x/y?z=1"), "/learn/x/y?z=1");
   assert.equal(safeNext(null), "/library");
-  for (const bad of ["//evil.com", "https://evil.com", "/\\evil.com", "javascript:alert(1)", ""]) assert.equal(safeNext(bad), "/library", bad);
+  for (const bad of ["//evil.com", "https://evil.com", "/\\evil.com", "/\t/evil.com", "/\n/evil.com", "javascript:alert(1)", ""]) assert.equal(safeNext(bad), "/library", bad);
 });

@@ -13,15 +13,24 @@ async function grant(userId: string, course: string, source: "purchase" | "pass"
   if (error) throw new Error(error.message);
 }
 
-/** Always re-read the subscription so out-of-order events can't regress access. */
+/**
+ * Recompute the pass from ALL of the customer's subscriptions, never from the one in the event.
+ * Out-of-order events, retries and events for an old lapsed subscription then can't revoke a newer one.
+ */
 async function syncSubscription(id: string) {
   const sub = await stripe().subscriptions.retrieve(id);
   const userId = sub.metadata.user_id;
   if (!userId) return;
-  const periodEnd = Math.max(0, ...sub.items.data.map((i) => i.current_period_end ?? 0));
-  const active = ACTIVE.includes(sub.status) && periodEnd > 0;
-  const expiresAt = active ? new Date(periodEnd * 1000).toISOString() : new Date().toISOString();
-  await grant(userId, PASS, "pass", expiresAt, sub.id);
+  const customer = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+  let best = 0;
+  let ref = sub.id;
+  for await (const s of stripe().subscriptions.list({ customer, status: "all", limit: 100 })) {
+    if (s.metadata.user_id !== userId || !ACTIVE.includes(s.status)) continue;
+    const end = Math.max(0, ...s.items.data.map((i) => i.current_period_end ?? 0));
+    if (end > best) { best = end; ref = s.id; }
+  }
+  const expiresAt = best > 0 ? new Date(best * 1000).toISOString() : new Date().toISOString();
+  await grant(userId, PASS, "pass", expiresAt, ref);
 }
 
 export default async (req: Request): Promise<Response> => {
