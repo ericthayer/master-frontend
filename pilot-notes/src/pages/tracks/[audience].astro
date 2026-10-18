@@ -1,0 +1,46 @@
+---
+import Site from "../../layouts/Site.astro";
+import CourseCard from "../../components/site/CourseCard.astro";
+import { audiences, getCourse, toOutline } from "../../content/catalog.ts";
+import { trackCopy } from "../../content/tracks.ts";
+import type { Audience } from "../../content/types.ts";
+import "../../styles/marketing.css";
+
+export function getStaticPaths() {
+  return (Object.keys(audiences) as Audience[]).map((audience) => ({ params: { audience }, props: { audience } }));
+}
+const { audience } = Astro.props as { audience: Audience };
+const a = audiences[audience];
+const t = trackCopy[audience];
+const course = getCourse(a.trackSlug);
+const outline = course ? toOutline(course) : null;
+---
+<Site title={`${a.label} track`} description={t.headline}>
+  <section class="wrap page" style={`--c: ${t.color}`}>
+    <p class="chip" style="justify-self:start">{t.emoji} {a.label}</p>
+    <h1 class="page__title">{t.headline}</h1>
+    <p class="page__lede">{a.pitch}</p>
+    <div class="tdetail">
+      <div class="panel"><h2 class="panel__h">Sound familiar?</h2><ul>{t.pains.map((p) => <li>{p}</li>)}</ul></div>
+      <div class="panel"><h2 class="panel__h">After this track</h2><ul>{t.wins.map((w) => <li>{w}</li>)}</ul></div>
+    </div>
+    {outline ? (
+      <div class="cgrid" style="max-width: 420px"><CourseCard course={outline} /></div>
+    ) : (
+      <div class="panel">
+        <h2 class="panel__h">Launching soon</h2>
+        <p>You’ll ship: <strong>{t.project}</strong>. Get an email the day it opens — and start with the free course meanwhile.</p>
+        <form class="free__form" name="leads" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="leads" />
+          <input type="hidden" name="source" value="track-page" />
+          <input type="hidden" name="track" value={a.trackSlug} />
+          <p hidden><label>Leave empty <input name="bot-field" /></label></p>
+          <label class="visually-hidden" for="t-email">Email address</label>
+          <input id="t-email" class="field" type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+          <button class="btn btn--primary" type="submit">Notify me</button>
+        </form>
+        <p><a href="/free">Start the free course →</a></p>
+      </div>
+    )}
+  </section>
+</Site>

@@ -1,0 +1,19 @@
+---
+import { product } from "../../config/product.ts";
+/* Rendered only once real, permissioned quotes exist in config/product.ts. */
+const quotes = product.testimonials;
+---
+{quotes.length > 0 && (
+  <section class="sec wrap" aria-labelledby="t-h">
+    <p class="sec__kicker">Learners</p>
+    <h2 id="t-h" class="sec__title">What people built</h2>
+    <div class="quotes">
+      {quotes.map((t) => (
+        <figure class="quote reveal">
+          <blockquote>“{t.quote}”</blockquote>
+          <figcaption><strong>{t.name}</strong> · {t.role}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+)}

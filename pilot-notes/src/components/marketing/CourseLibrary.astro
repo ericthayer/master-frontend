@@ -1,0 +1,10 @@
+---
+import CourseCard from "../site/CourseCard.astro";
+import { outlines } from "../../content/catalog.ts";
+---
+<section class="sec wrap" aria-labelledby="lib-h">
+  <p class="sec__kicker">Course library</p>
+  <h2 id="lib-h" class="sec__title">Under an hour each. Something live at the end.</h2>
+  <div class="cgrid">{outlines.map((c) => <CourseCard course={c} />)}</div>
+  <p><a class="btn btn--ghost" href="/courses">See every course</a></p>
+</section>

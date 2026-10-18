@@ -1,0 +1,15 @@
+---
+import { faqs } from "../../content/tracks.ts";
+---
+<section class="sec wrap" aria-labelledby="faq-h">
+  <p class="sec__kicker">FAQ</p>
+  <h2 id="faq-h" class="sec__title">Questions, answered quickly.</h2>
+  <div class="faq">
+    {faqs.map((f) => (
+      <details class="faq__item">
+        <summary>{f.q}</summary>
+        <p>{f.a}</p>
+      </details>
+    ))}
+  </div>
+</section>

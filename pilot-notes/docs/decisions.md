@@ -57,3 +57,11 @@ These are left out of the launch build:
 - Watermarked PDFs
 - The 3D hero on mobile and with reduced motion — a static poster is shown instead
 - Fake testimonials — the section stays hidden until real quotes exist
+
+## 6. Build-time choices made during implementation
+
+- **Course content is typed TypeScript, not MDX.** One source feeds the player, the paid-lesson API and the e-book, and the compiler catches broken checkpoints.
+- **Paid lesson bodies never ship in static HTML.** Only free modules and each course's preview module are pre-rendered. Everything else is served by `/api/lesson` to entitled users.
+- **Only the Stripe webhook grants access.** The checkout success page just waits for the entitlement to appear.
+- **3D hero = `three` + `@react-three/fiber` only.** `drei` and `motion` were cut: the scene needs no helpers, and scroll reveals use CSS scroll-driven animations, which degrade to static content. The scene loads lazily only on screens ≥768px that allow motion and support WebGL, and it pauses when scrolled off-screen or when the tab is hidden. Everyone else gets the CSS gradient backdrop.
+- **Leads go to Netlify Forms**, not a database table. Export them to the email tool at launch.

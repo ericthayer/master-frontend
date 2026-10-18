@@ -1,0 +1,25 @@
+---
+import HeroCanvas from "./HeroCanvas.tsx";
+import { product } from "../../config/product.ts";
+import { freeCourse } from "../../content/courses/copilot-in-30.ts";
+---
+<section class="hero">
+  <div class="hero__backdrop" aria-hidden="true"></div>
+  <HeroCanvas client:only="react" />
+  <div class="hero__inner wrap">
+    <p class="hero__kicker reveal"><span class="chip chip--accent">New</span> Courses for GitHub Copilot · under 60 minutes each</p>
+    <h1 class="hero__title reveal">The cheat sheet for<br /><span class="hero__grad">building with AI.</span></h1>
+    <p class="hero__lede reveal">Fast, game-like courses that take you from zero to a <strong>live project on the internet</strong> — no developer required.</p>
+    <div class="hero__ctas reveal">
+      <a class="btn btn--primary btn--lg" href={`/learn/${freeCourse.slug}/${freeCourse.modules[0]!.id}`}>Start the free course →</a>
+      <a class="btn btn--ghost btn--lg" href="#tracks">Find your track</a>
+    </div>
+    <ul class="hero__proof reveal">
+      <li>⚡ XP & badges</li>
+      <li>🧪 In-browser code sandbox</li>
+      <li>🚀 Ship a live URL</li>
+      <li>📘 E-book included</li>
+    </ul>
+  </div>
+  <p class="visually-hidden">{product.name}</p>
+</section>

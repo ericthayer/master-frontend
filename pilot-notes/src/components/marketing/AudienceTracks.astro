@@ -1,0 +1,25 @@
+---
+import { audiences, getCourse } from "../../content/catalog.ts";
+import { trackCopy } from "../../content/tracks.ts";
+import type { Audience } from "../../content/types.ts";
+const order: Audience[] = ["small-business", "product-design", "freelancer", "beginner"];
+---
+<section id="tracks" class="sec wrap" aria-labelledby="tracks-h">
+  <p class="sec__kicker">Audience tracks</p>
+  <h2 id="tracks-h" class="sec__title">Pick the track that sounds like you.</h2>
+  <div class="tracks">
+    {order.map((a) => {
+      const t = trackCopy[a];
+      const live = !!getCourse(audiences[a].trackSlug);
+      return (
+        <a class="track reveal" href={`/tracks/${a}`} style={`--c: ${t.color}`}>
+          <span class="track__emoji" aria-hidden="true">{t.emoji}</span>
+          <span class="track__label">{audiences[a].label}{a === "beginner" && <span class="chip chip--accent">Free</span>}{!live && <span class="chip">Coming soon</span>}</span>
+          <span class="track__head">{t.headline}</span>
+          <span class="track__proj">You’ll ship: {t.project}</span>
+          <span class="track__go" aria-hidden="true">→</span>
+        </a>
+      );
+    })}
+  </div>
+</section>

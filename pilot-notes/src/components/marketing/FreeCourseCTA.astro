@@ -1,0 +1,27 @@
+---
+import { freeCourse } from "../../content/courses/copilot-in-30.ts";
+import { toOutline } from "../../content/catalog.ts";
+const minutes = toOutline(freeCourse).minutes;
+---
+<section class="sec wrap" aria-labelledby="free-h">
+  <div class="free reveal">
+    <div>
+      <p class="sec__kicker">Free · no account</p>
+      <h2 id="free-h" class="sec__title">{freeCourse.title}</h2>
+      <p class="free__lede">{freeCourse.tagline} {freeCourse.modules.length} modules, {minutes} minutes, zero sign-ups.</p>
+      <ul class="free__list">{freeCourse.modules.map((m) => <li>{m.title}</li>)}</ul>
+      <a class="btn btn--primary btn--lg" href={`/learn/${freeCourse.slug}/${freeCourse.modules[0]!.id}`}>Start the free course →</a>
+    </div>
+    <form class="free__form" name="leads" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="bot-field">
+      <p class="free__formh">Prefer email? Get the 1-page Copilot cheat sheet.</p>
+      <input type="hidden" name="form-name" value="leads" />
+      <input type="hidden" name="source" value="home-free-cta" />
+      <input type="hidden" name="track" value="" />
+      <p hidden><label>Leave empty <input name="bot-field" /></label></p>
+      <label class="visually-hidden" for="free-email">Email address</label>
+      <input id="free-email" class="field" type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+      <button class="btn" type="submit">Send it</button>
+      <p class="free__fine">Optional. One email a week at most, unsubscribe anytime.</p>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,21 @@
+---
+const steps = [
+  { n: "01", title: "Learn in bites", text: "5–10 minute modules with one idea each. Read, watch the steps, try it in the sandbox.", icon: "📖" },
+  { n: "02", title: "Level up", text: "Quizzes, drag-and-drop and fill-in-the-code checkpoints earn XP, streaks and badges.", icon: "⚡" },
+  { n: "03", title: "Ship it live", text: "Every paid course ends with your own project on a real Netlify URL you can share.", icon: "🚀" },
+];
+---
+<section class="sec wrap" aria-labelledby="how-h">
+  <p class="sec__kicker">How it works</p>
+  <h2 id="how-h" class="sec__title">Like CliffsNotes — if CliffsNotes made you build something.</h2>
+  <ol class="how">
+    {steps.map((s) => (
+      <li class="how__step reveal">
+        <span class="how__icon" aria-hidden="true">{s.icon}</span>
+        <span class="how__n">{s.n}</span>
+        <h3>{s.title}</h3>
+        <p>{s.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>
