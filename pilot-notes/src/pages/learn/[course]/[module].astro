@@ -1,0 +1,36 @@
+---
+import Base from "../../../layouts/Base.astro";
+import CoursePlayer from "../../../components/player/CoursePlayer.tsx";
+import { courses, toOutline, trackOptions } from "../../../content/catalog.ts";
+import { reference } from "../../../content/reference.ts";
+import type { Course, Module } from "../../../content/types.ts";
+import "../../../styles/player.css";
+
+export function getStaticPaths() {
+  return courses.flatMap((course) =>
+    course.modules.map((module) => ({ params: { course: course.slug, module: module.id }, props: { course, module } })),
+  );
+}
+
+interface Props { course: Course; module: Module }
+const { course, module } = Astro.props;
+const outline = toOutline(course);
+// Paid module bodies never ship in static HTML; the player fetches them for entitled users.
+const content = course.tier === "free" ? { blocks: module.blocks, takeaways: module.takeaways, ...(module.sandbox ? { sandbox: module.sandbox } : {}) } : null;
+---
+<Base title={`${module.title} — ${course.title}`} description={module.objectives.join(" · ")} noindex={course.tier === "paid"}>
+  <CoursePlayer
+    client:only="react"
+    outline={outline}
+    moduleId={module.id}
+    content={content}
+    verifiedOn={reference.verifiedOn}
+    trackOptions={trackOptions()}
+  >
+    <div slot="fallback" class="player-fallback">
+      <p>{course.title}</p>
+      <h1>{module.title}</h1>
+      <noscript><p>The course player needs JavaScript.</p></noscript>
+    </div>
+  </CoursePlayer>
+</Base>

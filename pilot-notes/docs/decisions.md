@@ -29,7 +29,7 @@ Refunds: no questions asked within 30 days.
 
 ## 3. Copilot feature facts that need checking (OPEN)
 
-Course copy must not hard-code facts that change often. Every item below lives in `src/content/reference/copilot-desktop.md`, which carries a `verifiedOn` date and is shown in the player as **"Verified on …"**. Re-check all of it before launch and every quarter after that.
+Course copy must not hard-code facts that change often. Every item below lives in `src/content/reference.ts`, which carries a `verifiedOn` date and is shown in the player as **"Verified on …"**. Re-check all of it before launch and every quarter after that.
 
 - [ ] The product name and install flow for the desktop experience
 - [ ] Which models are available and which plans include them

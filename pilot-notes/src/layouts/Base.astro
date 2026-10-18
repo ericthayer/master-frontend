@@ -1,0 +1,42 @@
+---
+import "../styles/global.css";
+import { product } from "../config/product.ts";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Hide from search engines (player, account pages). */
+  noindex?: boolean;
+}
+const { title, description = product.tagline, noindex = false } = Astro.props;
+const fullTitle = title === product.name ? title : `${title} · ${product.name}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0d1113" />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+    <!-- Netlify Forms detection: React islands post to this form name. -->
+    <form name="leads" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="email" name="email" />
+      <input type="text" name="track" />
+      <input type="text" name="source" />
+      <input type="text" name="bot-field" />
+    </form>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+.wl { min-height: 100dvh; max-width: 760px; margin: 0 auto; padding: var(--space-8) var(--space-5); display: grid; align-content: center; gap: var(--space-5); }
+.wl__brand { font-family: var(--font-display); font-weight: 700; color: var(--accent); }
+.wl__title { font-size: var(--step-5); }
+.wl__lede { font-size: var(--step-1); color: var(--fg-muted); }
+.wl__ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.wl__note { color: var(--fg-muted); }
+.wl__form { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.wl__form .field { flex: 1 1 240px; width: auto; }
+.wl__fine { font-size: 0.75rem; color: var(--fg-faint); }

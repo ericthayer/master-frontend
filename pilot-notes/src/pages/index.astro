@@ -1,0 +1,27 @@
+---
+import Base from "../layouts/Base.astro";
+import { product } from "../config/product.ts";
+import { freeCourse } from "../content/courses/copilot-in-30.ts";
+import "../styles/waitlist.css";
+---
+<Base title={product.name} description={`${product.tagline} Fast, game-like courses for building with GitHub Copilot.`}>
+  <main id="main" class="wl">
+    <p class="wl__brand">✈ {product.name}</p>
+    <h1 class="wl__title">{product.tagline}</h1>
+    <p class="wl__lede">Fast, game-like courses that take you from zero to a <strong>live project on the internet</strong> with GitHub Copilot — in under an hour.</p>
+    <div class="wl__ctas">
+      <a class="btn btn--primary" href={`/learn/${freeCourse.slug}/${freeCourse.modules[0]!.id}`}>Start the free course →</a>
+    </div>
+    <p class="wl__note">No account needed. Paid tracks are launching soon:</p>
+    <form class="wl__form" name="leads" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="leads" />
+      <input type="hidden" name="source" value="waitlist" />
+      <input type="hidden" name="track" value="" />
+      <p hidden><label>Leave empty <input name="bot-field" /></label></p>
+      <label class="visually-hidden" for="wl-email">Email address</label>
+      <input id="wl-email" class="field" type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+      <button class="btn" type="submit">Join the waitlist</button>
+    </form>
+    <p class="wl__fine">{product.disclaimer}</p>
+  </main>
+</Base>
