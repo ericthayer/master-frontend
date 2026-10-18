@@ -1,0 +1,23 @@
+---
+import AccountMenu from "../account/AccountMenu.tsx";
+import { product } from "../../config/product.ts";
+const path = Astro.url.pathname;
+const links = [
+  { href: "/courses", label: "Courses" },
+  { href: "/#tracks", label: "Tracks" },
+  { href: "/pricing", label: "Pricing" },
+];
+---
+<header class="site-head">
+  <a class="site-head__brand" href="/">
+    <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><path d="M7 22 25 10l-6 15-4-5-8 2Z" fill="currentColor" /></svg>
+    {product.name}
+  </a>
+  <nav class="site-head__nav" aria-label="Main">
+    {links.map((l) => <a href={l.href} aria-current={path.startsWith(l.href) && l.href !== "/#tracks" ? "page" : undefined}>{l.label}</a>)}
+  </nav>
+  <div class="site-head__cta">
+    <a class="btn btn--primary btn--sm" href="/free">Start free</a>
+    <AccountMenu client:only="react" />
+  </div>
+</header>

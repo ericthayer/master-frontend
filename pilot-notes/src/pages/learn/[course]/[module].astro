@@ -1,7 +1,7 @@
 ---
 import Base from "../../../layouts/Base.astro";
 import CoursePlayer from "../../../components/player/CoursePlayer.tsx";
-import { courses, toOutline, trackOptions } from "../../../content/catalog.ts";
+import { courses, isPublicModule, toOutline, trackOptions } from "../../../content/catalog.ts";
 import { reference } from "../../../content/reference.ts";
 import type { Course, Module } from "../../../content/types.ts";
 import "../../../styles/player.css";
@@ -16,7 +16,7 @@ interface Props { course: Course; module: Module }
 const { course, module } = Astro.props;
 const outline = toOutline(course);
 // Paid module bodies never ship in static HTML; the player fetches them for entitled users.
-const content = course.tier === "free" ? { blocks: module.blocks, takeaways: module.takeaways, ...(module.sandbox ? { sandbox: module.sandbox } : {}) } : null;
+const content = isPublicModule(course, module.id) ? { blocks: module.blocks, takeaways: module.takeaways, ...(module.sandbox ? { sandbox: module.sandbox } : {}) } : null;
 ---
 <Base title={`${module.title} — ${course.title}`} description={module.objectives.join(" · ")} noindex={course.tier === "paid"}>
   <CoursePlayer

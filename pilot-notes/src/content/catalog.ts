@@ -1,8 +1,9 @@
 import type { Audience, Course, CourseOutline } from "./types.ts";
 import { freeCourse } from "./courses/copilot-in-30.ts";
+import { productCourse } from "./courses/copilot-for-product-teams.ts";
 
 /** Every published course. Order = library order. */
-export const courses: Course[] = [freeCourse];
+export const courses: Course[] = [freeCourse, productCourse];
 
 export const audiences: Record<Audience, { label: string; pitch: string; trackSlug: string }> = {
   beginner: { label: "Total beginners", pitch: "Never used AI to build anything? Start here, free.", trackSlug: "copilot-in-30" },
@@ -17,7 +18,7 @@ export function toOutline(course: Course): CourseOutline {
   return {
     ...rest,
     minutes: modules.reduce((sum, m) => sum + m.minutes, 0),
-    modules: modules.map(({ id, title, minutes, objectives, badge }) => ({ id, title, minutes, objectives, ...(badge ? { badge } : {}) })),
+    modules: modules.map(({ id, title, minutes, objectives, badge, preview }) => ({ id, title, minutes, objectives, ...(badge ? { badge } : {}), ...(preview ? { preview } : {}) })),
   };
 }
 
@@ -26,6 +27,11 @@ export function getCourse(slug: string): Course | undefined {
 }
 
 export const outlines: CourseOutline[] = courses.map(toOutline);
+
+/** Module bodies that may ship in static HTML: free courses and paid previews. */
+export function isPublicModule(course: Course, moduleId: string): boolean {
+  return course.tier === "free" || Boolean(course.modules.find((m) => m.id === moduleId)?.preview);
+}
 
 const TRACK_ANSWERS: Array<{ audience: Exclude<Audience, "beginner">; answer: string }> = [
   { audience: "small-business", answer: "🧾 Tools that save my business time and money" },

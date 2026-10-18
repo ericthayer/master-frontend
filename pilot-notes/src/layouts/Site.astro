@@ -1,0 +1,15 @@
+---
+import Base from "./Base.astro";
+import SiteHeader from "../components/site/SiteHeader.astro";
+import SiteFooter from "../components/site/SiteFooter.astro";
+import "../styles/site.css";
+
+interface Props { title: string; description?: string; noindex?: boolean }
+const props = Astro.props;
+---
+<Base {...props}>
+  <slot name="head" slot="head" />
+  <SiteHeader />
+  <main id="main" class="site-main" tabindex="-1"><slot /></main>
+  <SiteFooter />
+</Base>

@@ -1,0 +1,37 @@
+---
+import Site from "../../layouts/Site.astro";
+import { product } from "../../config/product.ts";
+
+export function getStaticPaths() {
+  return [
+    { params: { doc: "terms" }, props: { title: "Terms of service" } },
+    { params: { doc: "privacy" }, props: { title: "Privacy policy" } },
+    { params: { doc: "refunds" }, props: { title: "Refund policy" } },
+  ];
+}
+const { doc } = Astro.params;
+const { title } = Astro.props;
+---
+<Site title={title}>
+  <article class="wrap page" style="max-width: 72ch">
+    <h1 class="page__title">{title}</h1>
+    <p class="callout callout--warn" style="padding: 1rem; border-radius: 10px; background: rgb(245 184 74 / .1)">Draft placeholder — have this reviewed before launch.</p>
+    {doc === "refunds" && (
+      <>
+        <p>Not happy? Email <a href={`mailto:${product.supportEmail}`}>{product.supportEmail}</a> within {product.refundDays} days of purchase for a full refund. No questions asked.</p>
+        <p>Single-course purchases include lifetime access to that course and its e-book. The All-Access Pass renews yearly and can be cancelled any time from your account; access continues until the end of the paid period, and e-books you downloaded are yours to keep.</p>
+      </>
+    )}
+    {doc === "privacy" && (
+      <>
+        <p>We store your email address, purchases and course progress so you can sign in and pick up where you left off. Payments are processed by Stripe; we never see your card number. Without an account, progress stays in your browser only.</p>
+        <p>Optional email sign-ups are used for course news and can be unsubscribed from at any time.</p>
+      </>
+    )}
+    {doc === "terms" && (
+      <>
+        <p>Courses are for personal use. Projects you build in a course are yours. {product.disclaimer}</p>
+      </>
+    )}
+  </article>
+</Site>

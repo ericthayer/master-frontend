@@ -1,0 +1,30 @@
+---
+import { product } from "../../config/product.ts";
+---
+<footer class="site-foot">
+  <div class="site-foot__cols">
+    <div>
+      <p class="site-foot__brand">✈ {product.name}</p>
+      <p class="site-foot__tag">{product.tagline}</p>
+    </div>
+    <nav aria-label="Courses">
+      <p class="site-foot__h">Learn</p>
+      <a href="/free">Free course</a>
+      <a href="/courses">All courses</a>
+      <a href="/pricing">Pricing</a>
+    </nav>
+    <nav aria-label="Account">
+      <p class="site-foot__h">Account</p>
+      <a href="/login">Sign in</a>
+      <a href="/library">My library</a>
+      <a href="/account">Billing</a>
+    </nav>
+    <nav aria-label="Legal">
+      <p class="site-foot__h">Legal</p>
+      <a href="/legal/terms">Terms</a>
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/refunds">Refunds</a>
+    </nav>
+  </div>
+  <p class="site-foot__fine">© {new Date().getFullYear()} {product.name}. {product.disclaimer}</p>
+</footer>

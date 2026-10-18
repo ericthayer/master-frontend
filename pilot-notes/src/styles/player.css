@@ -235,3 +235,20 @@
   .phead__crumbs li + li::before { content: none; }
   .lesson__inner { padding: var(--space-5) var(--space-4) var(--space-8); }
 }
+
+/* Paywall gate */
+.lesson__loading { color: var(--fg-muted); padding: var(--space-6) 0; }
+.gate { display: grid; gap: var(--space-4); justify-items: center; text-align: center; padding: var(--space-7) var(--space-4); border-radius: var(--radius-l); background: radial-gradient(90% 60% at 50% 0%, var(--accent-soft), transparent 70%), var(--surface); border: 1px solid var(--border); }
+.gate__lock { font-size: 2.5rem; }
+.gate__h { font-size: var(--step-2); }
+.gate__text, .gate__note, .gate__fine { color: var(--fg-muted); max-width: 52ch; }
+.gate__fine { font-size: var(--step--1); }
+.gate__plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3); width: 100%; max-width: 560px; }
+.gate__plan { display: grid; gap: var(--space-2); justify-items: center; padding: var(--space-4); border-radius: var(--radius-m); background: var(--surface-2); border: 1px solid var(--border); }
+.gate__plan--best { border-color: var(--accent); }
+.gate__price { font-family: var(--font-display); font-size: var(--step-3); font-weight: 800; line-height: 1; }
+
+/* Live URL checkpoint */
+.cp--verify.is-ok { border-color: var(--accent); background: var(--accent-soft); }
+.cp--verify .lead__row { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.cp--verify .field { flex: 1 1 240px; }

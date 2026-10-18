@@ -67,6 +67,8 @@ export interface ModuleMeta {
   objectives: string[];
   /** Badge earned when this module is completed. */
   badge?: BadgeId;
+  /** Paid courses only: free preview module, shipped statically to everyone. */
+  preview?: boolean;
 }
 
 export interface Module extends ModuleMeta, ModuleContent {}

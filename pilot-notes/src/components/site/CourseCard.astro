@@ -1,0 +1,20 @@
+---
+import type { CourseOutline } from "../../content/types.ts";
+import { pricing } from "../../config/product.ts";
+import { audiences } from "../../content/catalog.ts";
+interface Props { course: CourseOutline }
+const { course } = Astro.props;
+const href = course.tier === "free" ? `/learn/${course.slug}/${course.modules[0]!.id}` : `/courses/${course.slug}`;
+---
+<article class="ccard" style={`--c: ${course.accent}`}>
+  <p class="ccard__aud">{audiences[course.audience].label}</p>
+  <h3 class="ccard__title"><a href={href}>{course.title}</a></h3>
+  <p class="ccard__tag">{course.tagline}</p>
+  <p class="ccard__proj"><span aria-hidden="true">🛠</span> {course.project}</p>
+  <ul class="ccard__meta">
+    <li>{course.minutes} min</li>
+    <li>{course.modules.length} modules</li>
+    <li class="chip chip--xp">⚡ {course.modules.length * 100 + (course.tier === "paid" ? 500 : 0)}+ XP</li>
+  </ul>
+  <p class="ccard__price">{course.tier === "free" ? "Free · no account" : `${pricing.course.label} · or in the pass`}</p>
+</article>

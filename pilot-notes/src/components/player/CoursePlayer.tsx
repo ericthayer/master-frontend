@@ -11,6 +11,12 @@ import { Celebration } from "./Celebration.tsx";
 import { LeadCapture } from "./LeadCapture.tsx";
 import { Inline } from "../Inline.tsx";
 import type { TrackOption } from "./checkpoints/TrackQuiz.tsx";
+import { VerifyUrl } from "./checkpoints/VerifyUrl.tsx";
+import { UpgradeGate } from "./UpgradeGate.tsx";
+import AccountMenu from "../account/AccountMenu.tsx";
+import { api, useAuth, useEntitlements } from "../../lib/account.ts";
+import { hasAccess } from "../../lib/access.ts";
+import { BADGES } from "../../lib/progress.ts";
 
 const SandboxPanel = lazy(() => import("./SandboxPanel.tsx"));
 const COMBO_KEY = "pilotnotes:combo";
@@ -28,8 +34,14 @@ function readCombo(): number {
   try { return Number(sessionStorage.getItem(COMBO_KEY)) || 0; } catch { return 0; }
 }
 
-export default function CoursePlayer({ outline, moduleId, content, verifiedOn, trackOptions }: PlayerProps) {
+type Remote = { status: "idle" | "loading" | "locked" | "error"; content: ModuleContent | null };
+
+export default function CoursePlayer({ outline, moduleId, content: staticContent, verifiedOn, trackOptions }: PlayerProps) {
   const progress = useProgress();
+  const auth = useAuth();
+  const ent = useEntitlements();
+  const [remote, setRemote] = useState<Remote>({ status: "idle", content: null });
+  const content = staticContent ?? remote.content;
   const index = outline.modules.findIndex((m) => m.id === moduleId);
   const meta = outline.modules[index]!;
   const next = outline.modules[index + 1];
@@ -56,6 +68,28 @@ export default function CoursePlayer({ outline, moduleId, content, verifiedOn, t
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [navOpen]);
+
+  // Paid module bodies are fetched for entitled users only.
+  useEffect(() => {
+    if (staticContent || auth.status === "loading") return;
+    if (auth.status === "signed-out") { setRemote({ status: "locked", content: null }); return; }
+    let live = true;
+    setRemote({ status: "loading", content: null });
+    api(`/api/lesson?course=${encodeURIComponent(outline.slug)}&module=${encodeURIComponent(moduleId)}`)
+      .then(async (res) => {
+        if (!live) return;
+        if (res.ok) setRemote({ status: "idle", content: (await res.json()) as ModuleContent });
+        else setRemote({ status: res.status === 401 || res.status === 403 ? "locked" : "error", content: null });
+      })
+      .catch(() => { if (live) setRemote({ status: "error", content: null }); });
+    return () => { live = false; };
+  }, [staticContent, auth.status, outline.slug, moduleId, ent.rows.length]);
+
+  const isLocked = (id: string) => {
+    if (outline.tier === "free") return false;
+    if (outline.modules.find((m) => m.id === id)?.preview) return false;
+    return !hasAccess(ent.rows, outline.slug);
+  };
 
   const toastTimer = useRef(0);
   function flash(msg: string) {
@@ -104,8 +138,17 @@ export default function CoursePlayer({ outline, moduleId, content, verifiedOn, t
         <p className="sb-cue__hint">The sandbox is on the right →</p>
       </aside>
     ) : null,
-    renderVerify: (_id, prompt) => (
-      <aside className="handoff"><p className="handoff__title">{prompt}</p><p>Sign in to verify your live URL.</p></aside>
+    renderVerify: (id, prompt) => (
+      <VerifyUrl
+        course={outline.slug}
+        prompt={prompt}
+        passed={Boolean(progress.checkpoints[key(id)])}
+        savedUrl={progress.liveUrls[outline.slug]}
+        onVerified={(url) => {
+          const earned = progressStore.dispatch({ type: "live", course: outline.slug, id, url });
+          flash(earned.length ? `+${XP.shipLive} XP · ${BADGES[earned[0]!].emoji} ${BADGES[earned[0]!].label}` : `+${XP.shipLive} XP`);
+        }}
+      />
     ),
   };
 
@@ -113,9 +156,9 @@ export default function CoursePlayer({ outline, moduleId, content, verifiedOn, t
 
   return (
     <div className={`player ${hasSandbox ? "player--sandbox" : ""}`} data-tab={tab}>
-      <ModuleSidebar outline={outline} moduleId={moduleId} progress={progress} open={navOpen} isLocked={() => false} />
+      <ModuleSidebar outline={outline} moduleId={moduleId} progress={progress} open={navOpen} isLocked={isLocked} />
       {navOpen && <div className="scrim" onClick={() => setNavOpen(false)} aria-hidden="true" />}
-      <PlayerHeader outline={outline} moduleTitle={meta.title} progress={progress} combo={combo} navOpen={navOpen} onToggleNav={() => setNavOpen((o) => !o)} />
+      <PlayerHeader outline={outline} moduleTitle={meta.title} progress={progress} combo={combo} navOpen={navOpen} onToggleNav={() => setNavOpen((o) => !o)} account={<AccountMenu />} />
 
       <main id="main" className="lesson" tabIndex={-1}>
         <article className="lesson__inner">
@@ -125,7 +168,15 @@ export default function CoursePlayer({ outline, moduleId, content, verifiedOn, t
             {meta.objectives.map((o) => <li key={o}>{o}</li>)}
           </ul>
 
-          {content ? <LessonBlocks blocks={content.blocks} ctx={ctx} /> : <p>Loading…</p>}
+          {content ? (
+            <LessonBlocks blocks={content.blocks} ctx={ctx} />
+          ) : remote.status === "locked" ? (
+            <UpgradeGate outline={outline} signedIn={auth.status === "signed-in"} />
+          ) : remote.status === "error" ? (
+            <p role="alert">This lesson didn’t load. Check your connection and refresh.</p>
+          ) : (
+            <p className="lesson__loading" role="status">Loading lesson…</p>
+          )}
 
           {content && content.takeaways.length > 0 && (
             <section className="takeaways" aria-labelledby="takeaways-h">
@@ -135,7 +186,7 @@ export default function CoursePlayer({ outline, moduleId, content, verifiedOn, t
           )}
 
           <footer className="lesson__foot">
-            {isDone ? (
+            {!content ? null : isDone ? (
               <p className="lesson__done">✓ Module complete</p>
             ) : (
               <>

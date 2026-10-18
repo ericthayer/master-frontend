@@ -1,0 +1,39 @@
+---
+import BuyButton from "../account/BuyButton.tsx";
+import { pricing, product } from "../../config/product.ts";
+import { outlines } from "../../content/catalog.ts";
+const paidCount = outlines.filter((c) => c.tier === "paid").length;
+---
+<div class="plans">
+  <article class="plan">
+    <h3 class="plan__name">Free</h3>
+    <p class="plan__price">$0</p>
+    <ul class="plan__list"><li>“Copilot in 30 Minutes”</li><li>No account needed</li><li>XP, badges & sandbox</li></ul>
+    <a class="btn" href="/free">Start free</a>
+  </article>
+  <article class="plan">
+    <h3 class="plan__name">Single course</h3>
+    <p class="plan__price">{pricing.course.label}<span> once</span></p>
+    <ul class="plan__list"><li>Lifetime access to one course</li><li>Its e-book (PDF + web)</li><li>Live-project badge</li></ul>
+    <a class="btn" href="/courses">Pick a course</a>
+  </article>
+  <article class="plan plan--best">
+    <p class="plan__flag">Best value</p>
+    <h3 class="plan__name">All-Access Pass</h3>
+    <p class="plan__price">{pricing.pass.label}<span> / year</span></p>
+    <ul class="plan__list"><li>Every course{paidCount > 1 ? ` (${paidCount} today)` : ""} + new releases</li><li>Every e-book — downloads are yours to keep</li><li>Already bought a course? Upgrade for {pricing.upgrade.label}</li></ul>
+    <BuyButton client:only="react" plan="pass" label="Get the pass" />
+  </article>
+</div>
+<p class="muted plans__fine">{product.refundDays}-day no-questions refund. Prices in USD; tax may apply.</p>
+<style>
+  .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: var(--space-4); align-items: stretch; }
+  .plan { position: relative; display: grid; gap: var(--space-3); align-content: start; padding: var(--space-6) var(--space-5); border-radius: var(--radius-l); background: var(--surface); border: 1px solid var(--border); }
+  .plan--best { border-color: var(--accent); background: radial-gradient(120% 70% at 50% 0%, var(--accent-soft), transparent 70%), var(--surface); box-shadow: 0 30px 80px -30px rgb(62 207 142 / 0.45); }
+  .plan__flag { position: absolute; top: calc(-1 * var(--space-3)); left: var(--space-5); padding: 0.1em 0.7em; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: var(--step--1); }
+  .plan__name { font-size: var(--step-1); }
+  .plan__price { font-family: var(--font-display); font-size: var(--step-4); font-weight: 800; line-height: 1; }
+  .plan__price span { font-size: var(--step-0); color: var(--fg-muted); font-weight: 500; }
+  .plan__list { margin: 0; padding-left: 1.1em; color: var(--fg-muted); display: grid; gap: var(--space-1); }
+  .plans__fine { margin-top: var(--space-3); font-size: var(--step--1); }
+</style>

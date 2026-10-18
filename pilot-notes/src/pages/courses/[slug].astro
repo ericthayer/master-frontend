@@ -1,0 +1,57 @@
+---
+import Site from "../../layouts/Site.astro";
+import BuyButton from "../../components/account/BuyButton.tsx";
+import { courses, toOutline, audiences } from "../../content/catalog.ts";
+import { pricing } from "../../config/product.ts";
+import type { Course } from "../../content/types.ts";
+
+export function getStaticPaths() {
+  return courses.map((course) => ({ params: { slug: course.slug }, props: { course } }));
+}
+interface Props { course: Course }
+const outline = toOutline(Astro.props.course);
+const first = outline.modules[0]!;
+const preview = outline.modules.find((m) => m.preview);
+---
+<Site title={outline.title} description={outline.tagline}>
+  <section class="wrap page">
+    <p class="chip chip--accent" style="justify-self:start">{audiences[outline.audience].label}</p>
+    <h1 class="page__title">{outline.title}</h1>
+    <p class="page__lede">{outline.tagline}</p>
+    <div class="cdetail">
+      <div class="page" style="padding:0">
+        <section class="panel">
+          <h2 class="panel__h">What you’ll ship</h2>
+          <p>🛠 {outline.project}</p>
+          <p class="muted">{outline.outcome}</p>
+        </section>
+        <h2 class="panel__h">{outline.modules.length} modules · {outline.minutes} minutes</h2>
+        <ol class="mods">
+          {outline.modules.map((m) => (
+            <li>
+              <h3>{m.title} <span class="chip">{m.minutes} min</span>{m.preview && <span class="chip chip--accent">Free preview</span>}</h3>
+              <ul>{m.objectives.map((o) => <li>{o}</li>)}</ul>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <aside class="cdetail__aside panel">
+        {outline.tier === "free" ? (
+          <>
+            <p class="auth__big">Free</p>
+            <p class="muted">No account needed. Progress saves in your browser.</p>
+            <a class="btn btn--primary" href={`/learn/${outline.slug}/${first.id}`}>Start now →</a>
+          </>
+        ) : (
+          <>
+            <p class="auth__big">{pricing.course.label}</p>
+            <p class="muted">{pricing.course.note}</p>
+            <BuyButton client:only="react" plan="course" course={outline.slug} label={`Buy · ${pricing.course.label}`} ownedHref={`/learn/${outline.slug}/${first.id}`} />
+            <p class="muted">or get every course with the <a href="/pricing">{pricing.pass.label}/year pass</a>.</p>
+            {preview && <a class="btn btn--ghost" href={`/learn/${outline.slug}/${preview.id}`}>Try module {outline.modules.indexOf(preview) + 1} free</a>}
+          </>
+        )}
+      </aside>
+    </div>
+  </section>
+</Site>
